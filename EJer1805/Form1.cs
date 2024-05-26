@@ -1,4 +1,5 @@
 ﻿using EJer1805.Data.DataAccess;
+using Google.Protobuf.WellKnownTypes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -55,10 +56,13 @@ namespace EJer1805
 
         private void tbcrear_Click(object sender, EventArgs e)
         {
-            string nombre = id.Text;
+            int id = int.Parse(id1.Text);
+            string nombre = tbnombre.Text;
             string raza = comboBoxraza.Text;
             int nivelpoder= (int)numericUpDownpoder.Value;
-            int respuesta = personaje.CrearPersonaje(nombre, raza, nivelpoder);
+            DateTime fechaactual = DateTime.Now;
+            string historiaper = textBoxhistoria.Text;
+            int respuesta = personaje.CrearPersonaje(id,nombre, raza, nivelpoder, fechaactual, historiaper);
             if (respuesta > 0)
             {
                 MessageBox.Show("Creado con Exito");
@@ -86,15 +90,17 @@ namespace EJer1805
 
         private void BuscarPorId()
         {
-            int idPersonajeBuscar = int.Parse(id.Text);
+            int idPersonajeBuscar = int.Parse(id1.Text);
             DataTable personajeEncontrado = personaje.BuscarPersonajePorId(idPersonajeBuscar);
             if (personajeEncontrado.Rows.Count>0)
             {
                 string nombre = personajeEncontrado.Rows[0]["nombre"].ToString();
                 string raza = personajeEncontrado.Rows[0]["raza"].ToString();
                 int nivelpoder = int.Parse(personajeEncontrado.Rows[0]["nivel_poder"].ToString());
-                
-                id.Text = nombre;
+                DateTime fechaactual = DateTime.Now;
+                string historiaper = textBoxhistoria.Text;
+
+                tbnombre.Text = nombre;
                 comboBoxraza.Text = raza;
                 numericUpDownpoder.Value = nivelpoder;
 
@@ -109,6 +115,49 @@ namespace EJer1805
         private void id_Leave(object sender, EventArgs e)
         {
             BuscarPorId();
+        }
+
+        private void id_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btactualizar_Click(object sender, EventArgs e)
+            {
+                int id = int.Parse(id1.Text);
+                string nombre = tbnombre.Text;
+                string raza = comboBoxraza.Text;
+                int nivelpoder = (int)numericUpDownpoder.Value;
+                DateTime fechaactual = DateTime.Now;
+                string historiaper = textBoxhistoria.Text;
+
+                // Intentar actualizar el personaje
+                int respuesta = personaje.actualizarpersonaje(id,nombre, raza, nivelpoder, fechaactual, historiaper);
+
+                if (respuesta > 0)
+                {
+                    MessageBox.Show("Datos del personaje actualizados exitosamente");
+                    dataGridViewPersonajes.DataSource = personaje.LeerPersonajes();
+                }
+                else
+                {
+                    MessageBox.Show("Error al actualizar los datos del personaje");
+                }
+            }
+
+        private void btdelete_Click(object sender, EventArgs e)
+        {
+            int id = int.Parse(id1.Text);
+            int respuesta = personaje.deletepersonaje(id);
+            if (respuesta > 0)
+            {
+                MessageBox.Show("Personaje eliminado exitosamente.");
+                dataGridViewPersonajes.DataSource = personaje.LeerPersonajes();
+            }
+            else
+            {
+                MessageBox.Show("No se encontró el personaje con el ID proporcionado.");
+            }
         }
     }
     }
